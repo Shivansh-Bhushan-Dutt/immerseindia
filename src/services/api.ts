@@ -69,8 +69,15 @@ export const authAPI = {
 
 // Experiences API
 export const experiencesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/experiences`);
+  getAll: async (params?: { page?: number; limit?: number; region?: string; search?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.region && params.region !== 'All') queryParams.append('region', params.region);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const url = `${API_BASE_URL}/experiences${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url);
     return handleResponse(response);
   },
 
@@ -118,8 +125,15 @@ export const experiencesAPI = {
 
 // Itineraries API
 export const itinerariesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/itineraries`);
+  getAll: async (params?: { page?: number; limit?: number; region?: string; search?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.region && params.region !== 'All') queryParams.append('region', params.region);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const url = `${API_BASE_URL}/itineraries${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url);
     return handleResponse(response);
   },
 
@@ -167,8 +181,15 @@ export const itinerariesAPI = {
 
 // Images API
 export const imagesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/images`);
+  getAll: async (params?: { page?: number; limit?: number; region?: string; search?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.region && params.region !== 'All') queryParams.append('region', params.region);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const url = `${API_BASE_URL}/images${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url);
     return handleResponse(response);
   },
 
