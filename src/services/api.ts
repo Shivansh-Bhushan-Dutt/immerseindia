@@ -30,8 +30,15 @@ const getAuthHeaders = () => {
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Network error' }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+    let errorMessage = `HTTP ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorData.message || errorMessage;
+    } catch (e) {
+      // If we can't parse the error response, use the status
+      errorMessage = `Network error - ${response.status} ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
   }
   return response.json();
 };
@@ -39,20 +46,33 @@ const handleResponse = async (response: Response) => {
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    
-    const data = await handleResponse(response);
-    
-    // Store token for future requests
-    if (data.token) {
-      setAuthToken(data.token);
+    try {
+      console.log('Attempting login to:', `${API_BASE_URL}/auth/login`);
+      console.log('API_BASE_URL:', API_BASE_URL);
+      
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+      
+      console.log('Login response status:', response.status);
+      
+      const data = await handleResponse(response);
+      
+      // Store token for future requests
+      if (data.token) {
+        setAuthToken(data.token);
+      }
+      
+      return data;
+    } catch (error: any) {
+      console.error('Login error details:', error);
+      throw new Error(error.message || 'Network connection failed. Please check your internet connection and try again.');
     }
-    
-    return data;
   },
 
   getProfile: async () => {
