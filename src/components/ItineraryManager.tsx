@@ -163,17 +163,30 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
         activities: block.trim().split('\n').filter(a => a.trim())
       }));
 
-      // Use image preview (either from file upload or URL)
-      const imageUrl = imagePreview || formData.imageUrl;
+      let itineraryData: any;
 
-      const itineraryData = {
-        destination: formData.destination,
-        region: formData.region,
-        title: formData.title,
-        duration: formData.duration,
-        days,
-        imageUrl
-      };
+      // If there's a selected image file, use FormData
+      if (selectedImage) {
+        const formDataToSend = new FormData();
+        formDataToSend.append('image', selectedImage);
+        formDataToSend.append('destination', formData.destination);
+        formDataToSend.append('region', formData.region);
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('duration', formData.duration);
+        formDataToSend.append('days', JSON.stringify(days));
+        
+        itineraryData = formDataToSend;
+      } else {
+        // Otherwise send JSON with imageUrl
+        itineraryData = {
+          destination: formData.destination,
+          region: formData.region,
+          title: formData.title,
+          duration: formData.duration,
+          days,
+          imageUrl: formData.imageUrl || ''
+        };
+      }
 
       if (editingItinerary) {
         // Update existing
