@@ -32,7 +32,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
     try {
       const response = await authAPI.login(email, password);
-      if (response.success) {
+      // Backend returns: { message, user, token }
+      // Check if we have user and token (successful login)
+      if (response.user && response.token) {
         onLogin(response.user, response.token);
       } else {
         setError('Invalid email or password');
