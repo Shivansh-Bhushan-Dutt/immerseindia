@@ -39,6 +39,11 @@ export function ItineraryViewer({ itineraries }: ItineraryViewerProps) {
   };
 
   const getOverviewText = (itinerary: Itinerary) => {
+    // Use custom description if available, otherwise generate one
+    if (itinerary.description) {
+      return itinerary.description;
+    }
+    
     const totalActivities = itinerary.days.reduce((acc, day) => acc + day.activities.length, 0);
     const firstFewActivities = itinerary.days.slice(0, 2).map(day => day.activities[0]).filter(Boolean);
     
@@ -127,7 +132,7 @@ export function ItineraryViewer({ itineraries }: ItineraryViewerProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg line-clamp-2">{itinerary.title}</CardTitle>
               <CardDescription className="text-sm line-clamp-4">
-                {getOverviewText(itinerary)}
+                {itinerary.description || getOverviewText(itinerary)}
               </CardDescription>
             </CardHeader>
 

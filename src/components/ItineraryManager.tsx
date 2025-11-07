@@ -28,6 +28,7 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
     region: 'North' as Region,
     title: '',
     duration: '',
+    description: '',
     daysData: '',
     imageUrl: ''
   });
@@ -61,7 +62,7 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
   };
 
   const resetForm = () => {
-    setFormData({ destination: '', region: 'North', title: '', duration: '', daysData: '', imageUrl: '' });
+    setFormData({ destination: '', region: 'North', title: '', duration: '', description: '', daysData: '', imageUrl: '' });
     setEditingItinerary(null);
     setSelectedImage(null);
     setImagePreview('');
@@ -83,6 +84,7 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
       region: itinerary.region,
       title: itinerary.title,
       duration: itinerary.duration,
+      description: itinerary.description || '',
       daysData,
       imageUrl: itinerary.imageUrl || ''
     });
@@ -187,6 +189,7 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
         formDataToSend.append('region', formData.region);
         formDataToSend.append('title', formData.title);
         formDataToSend.append('duration', formData.duration);
+        formDataToSend.append('description', formData.description);
         formDataToSend.append('days', JSON.stringify(days));
         
         itineraryData = formDataToSend;
@@ -197,6 +200,7 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
           region: formData.region,
           title: formData.title,
           duration: formData.duration,
+          description: formData.description,
           days,
           imageUrl: formData.imageUrl || ''
         };
@@ -225,6 +229,11 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
   };
 
   const getOverviewText = (itinerary: Itinerary) => {
+    // Use custom description if available, otherwise generate one
+    if (itinerary.description) {
+      return itinerary.description;
+    }
+    
     const totalActivities = itinerary.days.reduce((acc, day) => acc + day.activities.length, 0);
     const firstFewActivities = itinerary.days.slice(0, 2).map(day => day.activities[0]).filter(Boolean);
     
@@ -367,6 +376,21 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
                   placeholder="e.g., 7 Days / 6 Nights"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Card Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Brief description that will appear on the itinerary card (2-3 lines)"
+                  rows={3}
+                  required
+                />
+                <p className="text-xs text-gray-500">
+                  This description will be shown on the card instead of auto-generated content
+                </p>
               </div>
 
               <div className="space-y-2">

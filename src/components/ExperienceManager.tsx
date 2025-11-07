@@ -412,17 +412,12 @@ export function ExperienceManager({ data, onUpdateData }: ExperienceManagerProps
                   <div>
                     <p className="text-slate-700 mb-2 text-sm font-medium">Highlights:</p>
                     <ul className="space-y-1">
-                      {experience.highlights.slice(0, 3).map((highlight, idx) => (
+                      {experience.highlights.map((highlight, idx) => (
                         <li key={idx} className="text-slate-600 flex items-start gap-2 text-sm">
                           <span className="text-orange-500 mt-1 text-xs">•</span>
                           <span>{highlight}</span>
                         </li>
                       ))}
-                      {experience.highlights.length > 3 && (
-                        <li className="text-slate-500 text-xs italic">
-                          +{experience.highlights.length - 3} more highlights
-                        </li>
-                      )}
                     </ul>
                   </div>
 

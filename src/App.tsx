@@ -32,6 +32,7 @@ export type Itinerary = {
   region: Region;
   title: string;
   duration: string;
+  description?: string;
   days: { day: number; activities: string[] }[];
   imageUrl?: string;
   createdAt: number;
