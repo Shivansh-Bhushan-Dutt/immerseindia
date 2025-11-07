@@ -110,8 +110,22 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
   };
 
   const handleImageUrlChange = (url: string) => {
-    setFormData({ ...formData, imageUrl: url });
-    setImagePreview(url);
+    // Validate if it's a proper image URL
+    const trimmedUrl = url.trim();
+    
+    if (trimmedUrl) {
+      // Check if URL ends with image extension or contains image hosting domains
+      const isValidImageUrl = 
+        /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmedUrl) ||
+        /(unsplash\.com|pexels\.com|pixabay\.com|cloudinary\.com|imgur\.com)/.test(trimmedUrl);
+      
+      if (!isValidImageUrl && trimmedUrl.length > 0) {
+        toast.warning('Please provide a direct image URL (e.g., ends with .jpg, .png) or use file upload');
+      }
+    }
+    
+    setFormData({ ...formData, imageUrl: trimmedUrl });
+    setImagePreview(trimmedUrl);
     setSelectedImage(null);
   };
 
@@ -289,15 +303,18 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
                   </div>
 
                   <div>
-                    <Label htmlFor="imageUrl" className="text-sm">Image URL</Label>
+                    <Label htmlFor="imageUrl" className="text-sm">Image URL (Direct Link)</Label>
                     <Input
                       id="imageUrl"
                       type="url"
                       value={formData.imageUrl}
                       onChange={(e) => handleImageUrlChange(e.target.value)}
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://example.com/image.jpg or .png"
                       className="mt-1"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Must be a direct image link ending with .jpg, .png, etc.
+                    </p>
                   </div>
                 </div>
               </div>

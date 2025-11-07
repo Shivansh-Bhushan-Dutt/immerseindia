@@ -107,8 +107,22 @@ export function ExperienceManager({ data, onUpdateData }: ExperienceManagerProps
   };
 
   const handleImageUrlChange = (url: string) => {
-    setFormData({ ...formData, imageUrl: url });
-    setImagePreview(url);
+    // Validate if it's a proper image URL
+    const trimmedUrl = url.trim();
+    
+    if (trimmedUrl) {
+      // Check if URL ends with image extension or contains image hosting domains
+      const isValidImageUrl = 
+        /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i.test(trimmedUrl) ||
+        /(unsplash\.com|pexels\.com|pixabay\.com|cloudinary\.com|imgur\.com)/.test(trimmedUrl);
+      
+      if (!isValidImageUrl && trimmedUrl.length > 0) {
+        toast.warning('Please provide a direct image URL (e.g., ends with .jpg, .png) or use file upload');
+      }
+    }
+    
+    setFormData({ ...formData, imageUrl: trimmedUrl });
+    setImagePreview(trimmedUrl);
     setSelectedImage(null);
   };
 
@@ -142,17 +156,30 @@ export function ExperienceManager({ data, onUpdateData }: ExperienceManagerProps
     try {
       const highlights = formData.highlights.split('\n').filter(h => h.trim());
       
-      // Use image preview (either from file upload or URL)
-      const imageUrl = imagePreview || formData.imageUrl;
+      let experienceData: any;
 
-      const experienceData = {
-        destination: formData.destination,
-        region: formData.region,
-        title: formData.title,
-        description: formData.description,
-        highlights,
-        imageUrl
-      };
+      // If there's a file selected, use FormData
+      if (selectedImage) {
+        const formDataToSend = new FormData();
+        formDataToSend.append('image', selectedImage);
+        formDataToSend.append('destination', formData.destination);
+        formDataToSend.append('region', formData.region);
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('highlights', JSON.stringify(highlights));
+        
+        experienceData = formDataToSend;
+      } else {
+        // Otherwise send JSON with imageUrl
+        experienceData = {
+          destination: formData.destination,
+          region: formData.region,
+          title: formData.title,
+          description: formData.description,
+          highlights,
+          imageUrl: formData.imageUrl || ''
+        };
+      }
 
       if (editingExperience) {
         // Update existing
@@ -248,15 +275,18 @@ export function ExperienceManager({ data, onUpdateData }: ExperienceManagerProps
                   </div>
 
                   <div>
-                    <Label htmlFor="imageUrl" className="text-sm">Image URL</Label>
+                    <Label htmlFor="imageUrl" className="text-sm">Image URL (Direct Link)</Label>
                     <Input
                       id="imageUrl"
                       type="url"
                       value={formData.imageUrl}
                       onChange={(e) => handleImageUrlChange(e.target.value)}
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://example.com/image.jpg or .png"
                       className="mt-1"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Must be a direct image link ending with .jpg, .png, etc.
+                    </p>
                   </div>
                 </div>
               </div>

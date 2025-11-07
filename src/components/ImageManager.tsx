@@ -384,16 +384,28 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="url">Image URL</Label>
+                <Label htmlFor="url">Image URL (Direct Link)</Label>
                 <Input
                   id="url"
                   type="url"
                   value={uploadedFile ? '' : formData.url}
-                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
+                  onChange={(e) => {
+                    const url = e.target.value.trim();
+                    if (url) {
+                      const isValidImageUrl = 
+                        /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i.test(url) ||
+                        /(unsplash\.com|pexels\.com|pixabay\.com|cloudinary\.com|imgur\.com)/.test(url);
+                      
+                      if (!isValidImageUrl && url.length > 0) {
+                        toast.warning('Please provide a direct image URL (e.g., ends with .jpg, .png) or use file upload');
+                      }
+                    }
+                    setFormData({ ...formData, url });
+                  }}
+                  placeholder="https://example.com/image.jpg or .png"
                   disabled={!!uploadedFile}
                 />
-                <p className="text-sm text-slate-500">Use Unsplash or any other image URL</p>
+                <p className="text-sm text-slate-500">Must be a direct image link ending with .jpg, .png, etc.</p>
               </div>
 
               <div className="space-y-2">
